@@ -129,3 +129,9 @@ dmypy.json
 .pyre/
 
 .idea/
+
+chromedriver.exe
+secret.py
+test.html
+testapi.py
+WebCrawlingTest.py
