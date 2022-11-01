@@ -132,7 +132,5 @@ dmypy.json
 
 chromedriver.exe
 secret.py
-test.html
-testapi.py
 WebCrawlingTest.py
-XMLparsing.py
+testfile.py
