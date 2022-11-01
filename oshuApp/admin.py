@@ -1,3 +1,6 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import EventInformation, EventLocation
+
+admin.site.register(EventInformation)
+admin.site.register(EventLocation)
