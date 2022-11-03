@@ -1,7 +1,7 @@
 from django.urls import path
 from django.conf import settings
-from . import views
+from .views import EventList
 
 urlpatterns = [
-    path('', views.PostList.as_view()),
+    path('oshu/Event', EventList.as_view(), name='EventList'),
 ]

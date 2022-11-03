@@ -128,7 +128,19 @@ if __name__ == "__main__":
         district = eventlocation.address.split()
 
         EI.EventID = item['mt20id']
-        EI.District = district[1]
+        # EI.District = district[1]
+        district = district[1]
+        if district == '서구':
+            EI.District = 1
+        elif district == '유성구':
+            EI.District = 2
+        elif district == '중구':
+            EI.District = 3
+        elif district == '동구':
+            EI.District = 4
+        elif district == '대덕구':
+            EI.District = 5
+
         EI.EventName = item['prfnm']
         EI.isFestival = 1
         EI.ImgUrl = item['poster']

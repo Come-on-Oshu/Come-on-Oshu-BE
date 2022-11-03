@@ -1,9 +1,22 @@
-from django.contrib.sites import requests
-from django.shortcuts import render
+import request
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from django.views.generic import ListView
-from django.shortcuts import render
-import request
-import secret
+from .models import EventInformation
+
+class EventList(APIView):
+    def get(self, request):
+        district = request.query_params.get('district')
+        print(district)
+        # El = EventInformation.objects.get(District=district)
+        # print(El.EventID)
+
+        list = EventInformation.objects.filter(District=district)
+        print(list)
+
+        return Response({
+            "d":"d",
+            "o":list
+        })
+
 
