@@ -2,7 +2,7 @@ import request
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import EventInformation, EventLocation
+from .models import EventInformation, EventLocation, User, InterestEvent
 from .serializers import EventInformationSerializer, EventLocationSerializer
 
 
@@ -13,7 +13,6 @@ class EventList(APIView):
         # get the same object(EventInformation) as the request variable from DB
         EI_list = EventInformation.objects.filter(District=district)
         # use serializer to change DB object to json
-        serializer = EventInformationSerializer(EI_list)
         # variable to store event lists
         event_list = list()
         for item in EI_list:
@@ -21,6 +20,7 @@ class EventList(APIView):
             event_list.append(serializer.data)
 
         return Response(event_list)
+
 
 class EventDetails(APIView):
     def get(self, request):
@@ -40,8 +40,25 @@ class EventDetails(APIView):
 
         return Response(eventdetails)
 
+
 class MyPage(APIView):
     def get(self, request):
-        
+        user_id = request.query_params.get('userid')
+        userinfo = User.objects.get(userid=user_id)
+        eid_list = InterestEvent.objects.filter(userid__userid__contains=user_id)
 
+        return_list = list()
+        for item in eid_list:
+            EI = EventInformation.objects.filter(eid=item.eid.eid)
+            for j in EI:
+                EIserializer = EventInformationSerializer(j)
+                return_list.append(EIserializer.data)
 
+        return Response({
+            "username": userinfo.username,
+            "InterestEventList": return_list
+        })
+
+class Login(APIView):
+    def get(self, request):
+        return

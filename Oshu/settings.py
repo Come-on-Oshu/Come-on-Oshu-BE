@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'oshuApp',
     'rest_framework',
+    'users'
 ]
 
 MIDDLEWARE = [

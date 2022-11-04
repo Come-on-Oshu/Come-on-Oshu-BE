@@ -4,6 +4,11 @@ from django.db import models
 class User(models.Model):
     userid = models.TextField() # 사용자 id
     userpw = models.TextField() # 사용자 pw
+    username = models.TextField() # 사용자 name
+
+    def __str__(self):
+        return f'{self.userid}'
+
 
 class EventLocation(models.Model):
     lid = models.AutoField(primary_key=True)
@@ -27,6 +32,7 @@ class EventInformation(models.Model):
     edDate = models.TextField() #행사 끝 날짜
     Organization = models.TextField() #행사 주체 기관
     lid = models.ForeignKey(EventLocation, on_delete=models.SET_NULL, null=True) #행사 위치
+
 
 class InterestEvent(models.Model):
     userid = models.ForeignKey(User, on_delete=models.CASCADE)
