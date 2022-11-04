@@ -1,9 +1,14 @@
 import request
+from rest_framework.utils import json
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import EventInformation, EventLocation, User, InterestEvent
 from .serializers import EventInformationSerializer, EventLocationSerializer
+
+from rest_framework.authtoken.models import Token
+from django.contrib.auth import authenticate
+from django.contrib.auth.models import User
 
 
 class EventList(APIView):
@@ -59,6 +64,12 @@ class MyPage(APIView):
             "InterestEventList": return_list
         })
 
+
 class Login(APIView):
     def get(self, request):
-        return
+        user = authenticate(username=request.data['id'], password=request.data['pw'])
+
+        token = Token.objects.get(user=user)
+        return Response({
+            "Token": token.key
+        })
