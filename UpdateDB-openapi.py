@@ -160,4 +160,3 @@ if __name__ == "__main__":
 
     contents = requestEvent(stDate, edDate, '02')  # List of events in the current month
     updateDB(contents)
-
