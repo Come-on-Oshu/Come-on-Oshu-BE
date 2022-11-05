@@ -1,14 +1,13 @@
-import request
-from rest_framework.utils import json
-
+# api
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import EventInformation, EventLocation, User, InterestEvent
-from .serializers import EventInformationSerializer, EventLocationSerializer
-
+# authentication
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
+# models, serializers
+from .models import EventInformation, EventLocation, InterestEvent
+from .serializers import EventInformationSerializer, EventLocationSerializer
 
 
 class EventList(APIView):
@@ -48,9 +47,12 @@ class EventDetails(APIView):
 
 class MyPage(APIView):
     def get(self, request):
-        user_id = request.query_params.get('userid')
-        userinfo = User.objects.get(userid=user_id)
-        eid_list = InterestEvent.objects.filter(userid__userid__contains=user_id)
+        # get the request variable : id(uesr_id)
+        user_id = request.query_params.get('id')
+        # get the same object as the request variable(user id) from DB
+        userinfo = User.objects.get(username=user_id)
+        # get the list of interest of the request user
+        eid_list = InterestEvent.objects.filter(userid__username__contains=user_id)
 
         return_list = list()
         for item in eid_list:
@@ -67,9 +69,11 @@ class MyPage(APIView):
 
 class Login(APIView):
     def get(self, request):
+        # Check user who registerd as member by using received ID and PW and django authentication function
         user = authenticate(username=request.data['id'], password=request.data['pw'])
-
+        # get user's token
         token = Token.objects.get(user=user)
+        
         return Response({
             "Token": token.key
         })

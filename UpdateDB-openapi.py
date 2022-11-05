@@ -17,12 +17,12 @@ from oshuApp.models import EventInformation, EventLocation
 
 # request an openAPI and receive a list of events response
 # return the list of events for the current month
-def requestEvent(stDate, edDate):
+def requestEvent(stDate, edDate, eventstate):
     # open api url
     url = 'http://www.kopis.or.kr/openApi/restful/pblprfr'
 
     # open api request parameters
-    params = {'service': secret.key, 'stdate': stDate, 'eddate': edDate, 'cpage': 1, 'rows': 50, 'prfstate': '01',
+    params = {'service': secret.key, 'stdate': stDate, 'eddate': edDate, 'cpage': 1, 'rows': 50, 'prfstate': eventstate,
               'signgucode': 30}
 
     # open api request
@@ -72,21 +72,7 @@ def requestLocationDetail(LocationID):
     return contents
 
 
-if __name__ == "__main__":
-
-    # find the first and last date based on current date
-    today = date.today()
-
-    stDate = today.replace(day=1)
-    nextenDate = stDate + relativedelta.relativedelta(months=1)
-    edDate = nextenDate - timedelta(days=1)
-
-    stDate = today
-    edDate = edDate.strftime('%Y%m%d')
-
-    # request open api
-    contents = requestEvent(stDate, edDate)  # List of events in the current month
-
+def updateDB(contents):
     print("Insert data to EventLoaction table...")
     for item in contents:
         try:
@@ -127,27 +113,51 @@ if __name__ == "__main__":
 
         district = eventlocation.address.split()
 
-        EI.EventID = item['mt20id']
-        # EI.District = district[1]
-        district = district[1]
-        if district == '서구':
-            EI.District = 1
-        elif district == '유성구':
-            EI.District = 2
-        elif district == '중구':
-            EI.District = 3
-        elif district == '동구':
-            EI.District = 4
-        elif district == '대덕구':
-            EI.District = 5
+        try:
+            EI.EventID = item['mt20id']
+            # EI.District = district[1]
+            district = district[1]
+            if district == '서구':
+                EI.District = 1
+            elif district == '유성구':
+                EI.District = 2
+            elif district == '중구':
+                EI.District = 3
+            elif district == '동구':
+                EI.District = 4
+            elif district == '대덕구':
+                EI.District = 5
 
-        EI.EventName = item['prfnm']
-        EI.isFestival = 1
-        EI.ImgUrl = item['poster']
-        EI.stDate = stDate
-        EI.edDate = edDate
-        EI.Organization = item['fcltynm']
-        EI.lid = eventlocation
-        EI.save()
+            EI.EventName = item['prfnm']
+            EI.isFestival = 1
+            EI.ImgUrl = item['poster']
+            EI.stDate = stDate
+            EI.edDate = edDate
+            EI.Organization = item['fcltynm']
+            EI.lid = eventlocation
+            EI.save()
+        except:
+            print("중복 처리")
 
     print("Insertion complete")
+
+
+if __name__ == "__main__":
+
+    # find the first and last date based on current date
+    today = date.today()
+
+    stDate = today.replace(day=1)
+    nextenDate = stDate + relativedelta.relativedelta(months=1)
+    edDate = nextenDate - timedelta(days=1)
+
+    stDate = today
+    edDate = edDate.strftime('%Y%m%d')
+
+    # request open api
+    contents = requestEvent(stDate, edDate, '01')  # List of events in the current month
+    updateDB(contents)
+
+    contents = requestEvent(stDate, edDate, '02')  # List of events in the current month
+    updateDB(contents)
+

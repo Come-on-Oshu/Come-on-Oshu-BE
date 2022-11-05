@@ -15,7 +15,7 @@ class EventLocation(models.Model):
 
 class EventInformation(models.Model):
     eid = models.AutoField(primary_key=True)
-    EventID = models.TextField()  # 행사 ID
+    EventID = models.TextField(unique=True)  # 행사 ID
     District = models.TextField()  # 행사 지역구
     EventName = models.TextField()  # 행사 이름
     isFestival = models.IntegerField()  # 행사 or 축제 여부
