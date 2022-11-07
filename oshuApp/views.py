@@ -7,7 +7,7 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 # models, serializers
 from .models import EventInformation, EventLocation, InterestEvent
-from .serializers import EventInformationSerializer, EventLocationSerializer
+from .serializers import EventInformationSerializer, EventLocationSerializer, EventDetailInfoSerializer
 
 
 class EventList(APIView):
@@ -32,17 +32,10 @@ class EventDetails(APIView):
         eventid = request.query_params.get('eventid')
         # get the same object as the request variable(eventid) from DB
         event_info = EventInformation.objects.get(EventID=eventid)
-        # becouse of FK, can obtain location info related to event
-        lid = event_info.lid
         # use serializer to change DB object to json
-        serializer_EI = EventInformationSerializer(event_info)
-        serializer_EL = EventLocationSerializer(lid)
-        # variable to store event lists
-        eventdetails = list()
-        eventdetails.append(serializer_EI.data)
-        eventdetails.append(serializer_EL.data)
+        event_info = EventDetailInfoSerializer(event_info)
 
-        return Response(eventdetails)
+        return Response(event_info.data)
 
 
 class MyPage(APIView):
