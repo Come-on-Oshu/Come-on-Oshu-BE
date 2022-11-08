@@ -1,5 +1,4 @@
 from django.db import models
-from django.contrib.auth.models import User
 
 
 class EventLocation(models.Model):
@@ -26,11 +25,12 @@ class EventInformation(models.Model):
     lid = models.ForeignKey(EventLocation, on_delete=models.SET_NULL, null=True)  # 행사 위치
 
 
+class User(models.Model):
+    userID = models.TextField()
+    userPW = models.TextField()
+    userName = models.TextField()
+
+
 class InterestEvent(models.Model):
-    userid = models.ForeignKey(User, on_delete=models.CASCADE)
-    eid = models.ForeignKey(EventInformation, on_delete=models.CASCADE)
-
-
-class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    username = models.TextField()
+    userID = models.TextField(default='default')
+    eventID = models.TextField(default='default')
