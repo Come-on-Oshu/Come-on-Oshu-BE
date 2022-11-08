@@ -1,4 +1,5 @@
 # api
+from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 # authentication
@@ -6,7 +7,7 @@ from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 # models, serializers
-from .models import EventInformation, EventLocation, InterestEvent
+from .models import EventInformation, EventLocation, InterestEvent, User
 from .serializers import EventInformationSerializer, EventLocationSerializer, EventDetailInfoSerializer
 
 
@@ -40,33 +41,60 @@ class EventDetails(APIView):
 
 class MyPage(APIView):
     def get(self, request):
-        # get the request variable : id(uesr_id)
-        user_id = request.query_params.get('id')
-        # get the same object as the request variable(user id) from DB
-        userinfo = User.objects.get(username=user_id)
-        # get the list of interest of the request user
-        eid_list = InterestEvent.objects.filter(userid__username__contains=user_id)
+
+        userid = request.query_params.get('userid')
+        user = User.objects.get(userID=userid)
+        interest_event_list = InterestEvent.objects.filter(userID=userid)
 
         return_list = list()
-        for item in eid_list:
-            EI = EventInformation.objects.filter(eid=item.eid.eid)
+        for item in interest_event_list:
+            EI = EventInformation.objects.filter(EventID=item.eventID)
             for j in EI:
-                EIserializer = EventInformationSerializer(j)
-                return_list.append(EIserializer.data)
+                event_info = EventDetailInfoSerializer(j)
+                return_list.append(event_info.data)
 
         return Response({
-            "username": userinfo.username,
+            "username": user.userName,
             "InterestEventList": return_list
         })
 
 
 class Login(APIView):
     def get(self, request):
-        # Check user who registerd as member by using received ID and PW and django authentication function
-        user = authenticate(username=request.data['id'], password=request.data['pw'])
-        # get user's token
-        token = Token.objects.get(user=user)
-        
-        return Response({
-            "Token": token.key
-        })
+
+        userid = request.query_params.get('id')
+        password = request.query_params.get('pw')
+
+        return_message = {
+            'status': -1,
+            'message': ''
+        }
+
+        try:
+            user = User.objects.get(userID=userid)
+        except User.DoesNotExist:
+            return_message['status'] = 0
+            return_message['message'] = 'id가 없습니다'
+            return Response(return_message)
+
+        if (user.userPW == password):
+            return_message['status'] = 1
+            return_message['message'] = "login 성공"
+        else:
+            return_message['status'] = 2
+            return_message['message'] = "비밀번호가 일치하지 않습니다."
+
+        return Response(return_message)
+
+
+class AddInterestEvent(APIView):
+    def post(self, request):
+        userid = request.query_params.get('userid')
+        eventid = request.query_params.get('eventid')
+
+        Interest_event = InterestEvent()
+        Interest_event.userID = userid
+        Interest_event.eventID = eventid
+        Interest_event.save()
+
+        return Response(status=200)
